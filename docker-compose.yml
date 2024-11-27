@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  nest-app:
+    container_name: nest-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_HOST: localhost
+      DATABASE_PORT: 5432
+      DATABASE_USER: ramkaf
+      DATABASE_PASSWORD: 321165
+      DATABASE_NAME: nestdb
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: 321165
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nest-net
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ramkaf
+      POSTGRES_PASSWORD: 321165
+      POSTGRES_DB: nestdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nest-net
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "321165"]
+    networks:
+      - nest-net
+
+volumes:
+  postgres_data:
+
+networks:
+  nest-net:
+    driver: bridge
